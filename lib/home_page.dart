@@ -3,9 +3,10 @@ import 'asignation_page.dart';
 import 'usuarios_page.dart';
 import 'catalogos_page.dart';
 import 'login_page.dart';
+import 'camiones_page.dart';
 
 class HomePage extends StatefulWidget {
-  final Map user; // 👈 AHORA RECIBE TODO EL USUARIO
+  final Map user;
 
   const HomePage({super.key, required this.user});
 
@@ -16,24 +17,15 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int paginaActual = 0;
 
-  List<Map<String, dynamic>> menuItems = [];
-
-  final List<Widget> paginas = [
-    const Center(
-      child: Text("Bienvenido al sistema 🚀", style: TextStyle(fontSize: 20)),
-    ),
-    const AsignacionesPage(),
-    const UsuariosPage(),
-    const CatalogosPage(),
-  ];
+  late List<Map<String, dynamic>> menuItems;
 
   @override
   void initState() {
     super.initState();
 
-    // 🔥 OBTENER ROL DESDE EL USER
     int rol = int.parse(widget.user["rol"].toString());
 
+    // 🔥 MENÚ SEGÚN ROL
     if (rol == 1) {
       menuItems = [
         {"title": "Inicio", "icon": Icons.home, "page": 0},
@@ -48,15 +40,52 @@ class _HomePageState extends State<HomePage> {
       ];
     } else if (rol == 3) {
       menuItems = [
-        //{"title": "Inicio", "icon": Icons.home, "page": 0},
         {"title": "Incidencias", "icon": Icons.assignment, "page": 1},
-        //{"title": "Usuarios", "icon": Icons.people, "page": 2},
       ];
     } else {
       menuItems = [
         {"title": "Inicio", "icon": Icons.home, "page": 0},
       ];
     }
+  }
+
+  // 🔥 CONTROL CENTRAL DE NAVEGACIÓN
+  void cambiarPagina(int index) {
+    setState(() {
+      paginaActual = index;
+    });
+  }
+
+  // 🔥 PÁGINAS DINÁMICAS (MEJOR CONTROL)
+  Widget getPagina() {
+    if (paginaActual == 0) {
+      return const Center(
+        child: Text(
+          "Bienvenido al sistema 🚀",
+          style: TextStyle(fontSize: 20),
+        ),
+      );
+    }
+
+    if (paginaActual == 1) {
+      return const AsignacionesPage();
+    }
+
+    if (paginaActual == 2) {
+      return const UsuariosPage();
+    }
+
+    if (paginaActual == 3) {
+      return CamionesPage(
+        key: const ValueKey("camiones"), // 🔥 evita bugs de rebuild
+        onGuardado: () {
+          print("🔥 REGRESANDO AL HOME");
+          cambiarPagina(0);
+        },
+      );
+    }
+
+    return const Center(child: Text("Página no encontrada"));
   }
 
   void cerrarSesion(BuildContext context) {
@@ -87,15 +116,12 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    int rol = int.parse(widget.user["rol"].toString());
-
     return Scaffold(
       appBar: AppBar(title: const Text("Menú Principal")),
 
       drawer: Drawer(
         child: Column(
           children: [
-            // 🔥 HEADER CON DATOS REALES
             UserAccountsDrawerHeader(
               accountName: Text(
                 "${widget.user["nombre"]} ${widget.user["apellido_paterno"]}",
@@ -106,14 +132,13 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
 
+            // 🔥 MENÚ DINÁMICO
             ...menuItems.map((item) {
               return ListTile(
                 leading: Icon(item["icon"]),
                 title: Text(item["title"]),
                 onTap: () {
-                  setState(() {
-                    paginaActual = item["page"];
-                  });
+                  cambiarPagina(item["page"]);
                   Navigator.pop(context);
                 },
               );
@@ -134,7 +159,11 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
 
-      body: paginas[paginaActual],
+      // 🔥 CONTENIDO
+      body: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 300), // 👈 transición suave
+        child: getPagina(),
+      ),
     );
   }
 }
