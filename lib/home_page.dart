@@ -1,9 +1,11 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'asignation_page.dart';
 import 'usuarios_page.dart';
-import 'catalogos_page.dart';
 import 'login_page.dart';
 import 'camiones_page.dart';
+import 'rutas_page.dart';
+import 'horarios_page.dart';
 
 class HomePage extends StatefulWidget {
   final Map user;
@@ -25,22 +27,16 @@ class _HomePageState extends State<HomePage> {
 
     int rol = int.parse(widget.user["rol"].toString());
 
-    // 🔥 MENÚ SEGÚN ROL
     if (rol == 1) {
       menuItems = [
         {"title": "Inicio", "icon": Icons.home, "page": 0},
         {"title": "Asignaciones", "icon": Icons.assignment, "page": 1},
         {"title": "Usuarios", "icon": Icons.people, "page": 2},
-        {"title": "Catálogos", "icon": Icons.category, "page": 3},
       ];
     } else if (rol == 2) {
       menuItems = [
         {"title": "Inicio", "icon": Icons.home, "page": 0},
         {"title": "Asignaciones", "icon": Icons.assignment, "page": 1},
-      ];
-    } else if (rol == 3) {
-      menuItems = [
-        {"title": "Incidencias", "icon": Icons.assignment, "page": 1},
       ];
     } else {
       menuItems = [
@@ -49,51 +45,95 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  // 🔥 CONTROL CENTRAL DE NAVEGACIÓN
   void cambiarPagina(int index) {
     setState(() {
       paginaActual = index;
     });
   }
 
-  // 🔥 PÁGINAS DINÁMICAS (MEJOR CONTROL)
   Widget getPagina() {
-    if (paginaActual == 0) {
-      return const Center(
-        child: Text(
-          "Bienvenido al sistema 🚀",
-          style: TextStyle(fontSize: 20),
+    switch (paginaActual) {
+      case 0:
+        return _homePrincipal();
+      case 1:
+        return const AsignacionesPage();
+      case 2:
+        return const UsuariosPage();
+      case 3:
+        return CamionesPage(onGuardado: () => cambiarPagina(0));
+      case 4:
+        return const RutasPage();
+      case 5:
+        return const HorariosPage();
+      default:
+        return const Center(child: Text("Página no encontrada"));
+    }
+  }
+
+  // 🔥 HOME PRINCIPAL ESTILO LOGIN
+  Widget _homePrincipal() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(25),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+            child: Container(
+              padding: const EdgeInsets.all(25),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.08),
+                borderRadius: BorderRadius.circular(25),
+                border: Border.all(color: Colors.white.withOpacity(0.2)),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.directions_bus,
+                      size: 50, color: Color(0xFFD4AF37)),
+
+                  const SizedBox(height: 15),
+
+                  Text(
+                    "Bienvenido ${widget.user["nombre"]}",
+                    style: const TextStyle(
+                      fontSize: 20,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  const Text(
+                    "Sistema de asignaciones",
+                    style: TextStyle(color: Colors.white70),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
-      );
-    }
+      ),
+    );
+  }
 
-    if (paginaActual == 1) {
-      return const AsignacionesPage();
-    }
-
-    if (paginaActual == 2) {
-      return const UsuariosPage();
-    }
-
-    if (paginaActual == 3) {
-      return CamionesPage(
-        key: const ValueKey("camiones"), // 🔥 evita bugs de rebuild
-        onGuardado: () {
-          print("🔥 REGRESANDO AL HOME");
-          cambiarPagina(0);
-        },
-      );
-    }
-
-    return const Center(child: Text("Página no encontrada"));
+  Widget _menuItem(String title, int page) {
+    return ListTile(
+      title: Text(title, style: const TextStyle(color: Colors.white70)),
+      onTap: () {
+        cambiarPagina(page);
+        Navigator.pop(context);
+      },
+    );
   }
 
   void cerrarSesion(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (_) => AlertDialog(
         title: const Text("Cerrar sesión"),
-        content: const Text("¿Estás seguro que deseas salir?"),
+        content: const Text("¿Estás seguro?"),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -117,26 +157,64 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Menú Principal")),
+      extendBodyBehindAppBar: true,
 
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: const Text("Inicio"),
+        centerTitle: true,
+      ),
+
+      // 🔥 FONDO IGUAL QUE LOGIN
+      body: Stack(
+        children: [
+          SizedBox.expand(
+            child: Image.asset(
+              "assets/background.png",
+              fit: BoxFit.cover,
+            ),
+          ),
+
+          Container(
+            color: Colors.black.withOpacity(0.6),
+          ),
+
+          SafeArea(
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              child: getPagina(),
+            ),
+          ),
+        ],
+      ),
+
+      // 🔥 DRAWER MODERNO
       drawer: Drawer(
+        backgroundColor: const Color(0xFF1A1A1A),
         child: Column(
           children: [
             UserAccountsDrawerHeader(
+              decoration: const BoxDecoration(color: Color(0xFF1E1E1E)),
               accountName: Text(
                 "${widget.user["nombre"]} ${widget.user["apellido_paterno"]}",
+                style: const TextStyle(color: Colors.white),
               ),
-              accountEmail: Text(widget.user["email"]),
+              accountEmail: Text(
+                widget.user["email"],
+                style: const TextStyle(color: Colors.white70),
+              ),
               currentAccountPicture: const CircleAvatar(
-                child: Icon(Icons.person, size: 40),
+                backgroundColor: Color(0xFFD4AF37),
+                child: Icon(Icons.person, color: Colors.black),
               ),
             ),
 
-            // 🔥 MENÚ DINÁMICO
             ...menuItems.map((item) {
               return ListTile(
-                leading: Icon(item["icon"]),
-                title: Text(item["title"]),
+                leading: Icon(item["icon"], color: Colors.white70),
+                title: Text(item["title"],
+                    style: const TextStyle(color: Colors.white)),
                 onTap: () {
                   cambiarPagina(item["page"]);
                   Navigator.pop(context);
@@ -144,25 +222,32 @@ class _HomePageState extends State<HomePage> {
               );
             }).toList(),
 
+            ExpansionTile(
+              iconColor: Colors.white,
+              collapsedIconColor: Colors.white70,
+              title: const Text("Catálogos",
+                  style: TextStyle(color: Colors.white)),
+              leading:
+                  const Icon(Icons.category, color: Colors.white70),
+              children: [
+                _menuItem("Camiones", 3),
+                _menuItem("Rutas", 4),
+                _menuItem("Horarios", 5),
+              ],
+            ),
+
             const Spacer(),
 
             ListTile(
               leading: const Icon(Icons.logout, color: Colors.red),
-              title: const Text("Cerrar sesión"),
-              onTap: () {
-                cerrarSesion(context);
-              },
+              title: const Text("Cerrar sesión",
+                  style: TextStyle(color: Colors.white)),
+              onTap: () => cerrarSesion(context),
             ),
 
             const SizedBox(height: 20),
           ],
         ),
-      ),
-
-      // 🔥 CONTENIDO
-      body: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 300), // 👈 transición suave
-        child: getPagina(),
       ),
     );
   }
