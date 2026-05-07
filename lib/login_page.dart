@@ -24,8 +24,8 @@ class _LoginPageState extends State<LoginPage> {
     });
 
     try {
-      final url = Uri.parse("http://192.168.1.178/api/login.php");
-       //final url = Uri.parse("http://192.168.1.156/api/login.php");
+      //final url = Uri.parse("http://192.168.1.178/api/login.php");
+       final url = Uri.parse("http://192.168.1.156/api/login.php");
 
       // 🔥 DEBUG: lo que envías
       debugPrint("Usuario enviado: ${usuario.text}");
