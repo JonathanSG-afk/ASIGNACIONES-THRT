@@ -243,7 +243,7 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       _menuItem("Camiones", 3),
                       _menuItem("Rutas", 4),
-                      _menuItem("Horarios", 5),
+                      _menuItem("Clientes", 5),
                     ],
                   ),
 
