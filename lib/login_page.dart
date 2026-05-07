@@ -12,7 +12,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-
   final TextEditingController usuario = TextEditingController();
   final TextEditingController password = TextEditingController();
 
@@ -24,10 +23,7 @@ class _LoginPageState extends State<LoginPage> {
     final response = await http.post(
       url,
       headers: {"Content-Type": "application/json"},
-      body: jsonEncode({
-        "user": usuario.text,
-        "password": password.text,
-      }),
+      body: jsonEncode({"user": usuario.text, "password": password.text}),
     );
 
     final data = jsonDecode(response.body);
@@ -35,9 +31,7 @@ class _LoginPageState extends State<LoginPage> {
     if (data["success"]) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (_) => HomePage(user: data["user"]),
-        ),
+        MaterialPageRoute(builder: (_) => HomePage(user: data["user"])),
       );
     }
   }
@@ -45,143 +39,170 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true, // 🔥 evita overflow
+
       body: Stack(
         children: [
-
-          // 🔥 FONDO (CAMIÓN)
+          // 🔥 FONDO
           SizedBox.expand(
-            child: Image.asset(
-              "assets/background.png",
-              fit: BoxFit.cover,
-            ),
+            child: Image.asset("assets/background.png", fit: BoxFit.cover),
           ),
 
-          // 🔥 OSCURECER FONDO
-          Container(
-            color: Colors.black.withOpacity(0.5),
-          ),
+          // 🔥 OSCURECER
+          Container(color: Colors.black.withOpacity(0.5)),
 
-          // 🔥 CONTENIDO
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(25),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(25),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.08),
-                      borderRadius: BorderRadius.circular(25),
-                      border: Border.all(
-                        color: Colors.white.withOpacity(0.2),
+          // 🔥 CONTENIDO AJUSTADO
+          SingleChildScrollView(
+            child: SizedBox(
+              height: MediaQuery.of(context).size.height,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // 🔥 LOGO
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 25),
+                      child: Image.asset(
+                        "assets/logo.png",
+                        height: 200,
                       ),
                     ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
 
-                        const Text(
-                          "Login",
-                          style: TextStyle(
-                            fontSize: 24,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-
-                        const SizedBox(height: 10),
-
-                        const Text(
-                          "Bienvenido, inicia sesión",
-                          style: TextStyle(color: Colors.white70),
-                        ),
-
-                        const SizedBox(height: 25),
-
-                        // 🔥 INPUT USUARIO
-                        TextField(
-                          controller: usuario,
-                          style: const TextStyle(color: Colors.white),
-                          decoration: InputDecoration(
-                            hintText: "Usuario",
-                            hintStyle: const TextStyle(color: Colors.white60),
-                            prefixIcon: const Icon(Icons.person, color: Colors.white70),
-                            filled: true,
-                            fillColor: Colors.white.withOpacity(0.1),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                              borderSide: BorderSide.none,
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 15),
-
-                        // 🔥 INPUT PASSWORD
-                        TextField(
-                          controller: password,
-                          obscureText: true,
-                          style: const TextStyle(color: Colors.white),
-                          decoration: InputDecoration(
-                            hintText: "Contraseña",
-                            hintStyle: const TextStyle(color: Colors.white60),
-                            prefixIcon: const Icon(Icons.lock, color: Colors.white70),
-                            filled: true,
-                            fillColor: Colors.white.withOpacity(0.1),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                              borderSide: BorderSide.none,
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 25),
-
-                        // 🔥 BOTÓN
-                        SizedBox(
-                          width: double.infinity,
-                          height: 50,
-                          child: ElevatedButton(
-                            onPressed: cargando ? null : login,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.transparent,
-                              shadowColor: Colors.transparent,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
+                    // 🔥 CARD LOGIN
+                    Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(25),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                          child: Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(25),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.08),
+                              borderRadius: BorderRadius.circular(25),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.2),
                               ),
                             ),
-                            child: Ink(
-                              decoration: BoxDecoration(
-                                gradient: const LinearGradient(
-                                  colors: [
-                                    Color(0xFFD4AF37),
-                                    Color(0xFFB8962E),
-                                  ],
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Text(
+                                  "Login",
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Container(
-                                alignment: Alignment.center,
-                                child: cargando
-                                    ? const CircularProgressIndicator(color: Colors.black)
-                                    : const Text(
-                                        "Iniciar Sesión",
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+
+                                const SizedBox(height: 10),
+
+                                const Text(
+                                  "Bienvenido, inicia sesión",
+                                  style: TextStyle(color: Colors.white70),
+                                ),
+
+                                const SizedBox(height: 25),
+
+                                TextField(
+                                  controller: usuario,
+                                  style: const TextStyle(color: Colors.white),
+                                  decoration: InputDecoration(
+                                    hintText: "Usuario",
+                                    hintStyle:
+                                        const TextStyle(color: Colors.white60),
+                                    prefixIcon: const Icon(
+                                      Icons.person,
+                                      color: Colors.white70,
+                                    ),
+                                    filled: true,
+                                    fillColor:
+                                        Colors.white.withOpacity(0.1),
+                                    border: OutlineInputBorder(
+                                      borderRadius:
+                                          BorderRadius.circular(20),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                  ),
+                                ),
+
+                                const SizedBox(height: 15),
+
+                                TextField(
+                                  controller: password,
+                                  obscureText: true,
+                                  style: const TextStyle(color: Colors.white),
+                                  decoration: InputDecoration(
+                                    hintText: "Contraseña",
+                                    hintStyle:
+                                        const TextStyle(color: Colors.white60),
+                                    prefixIcon: const Icon(
+                                      Icons.lock,
+                                      color: Colors.white70,
+                                    ),
+                                    filled: true,
+                                    fillColor:
+                                        Colors.white.withOpacity(0.1),
+                                    border: OutlineInputBorder(
+                                      borderRadius:
+                                          BorderRadius.circular(20),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                  ),
+                                ),
+
+                                const SizedBox(height: 25),
+
+                                SizedBox(
+                                  width: double.infinity,
+                                  height: 50,
+                                  child: ElevatedButton(
+                                    onPressed: cargando ? null : login,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.transparent,
+                                      shadowColor: Colors.transparent,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(20),
                                       ),
-                              ),
+                                    ),
+                                    child: Ink(
+                                      decoration: BoxDecoration(
+                                        gradient: const LinearGradient(
+                                          colors: [
+                                            Color(0xFFD4AF37),
+                                            Color(0xFFB8962E),
+                                          ],
+                                        ),
+                                        borderRadius:
+                                            BorderRadius.circular(20),
+                                      ),
+                                      child: Container(
+                                        alignment: Alignment.center,
+                                        child: cargando
+                                            ? const CircularProgressIndicator(
+                                                color: Colors.black,
+                                              )
+                                            : const Text(
+                                                "Iniciar Sesión",
+                                                style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
-
-                      ],
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ),
             ),

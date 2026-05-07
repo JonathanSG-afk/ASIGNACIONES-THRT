@@ -70,7 +70,6 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  // 🔥 HOME PRINCIPAL ESTILO LOGIN
   Widget _homePrincipal() {
     return Center(
       child: Padding(
@@ -91,9 +90,7 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   const Icon(Icons.directions_bus,
                       size: 50, color: Color(0xFFD4AF37)),
-
                   const SizedBox(height: 15),
-
                   Text(
                     "Bienvenido ${widget.user["nombre"]}",
                     style: const TextStyle(
@@ -102,9 +99,7 @@ class _HomePageState extends State<HomePage> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-
                   const SizedBox(height: 10),
-
                   const Text(
                     "Sistema de asignaciones",
                     style: TextStyle(color: Colors.white70),
@@ -166,7 +161,6 @@ class _HomePageState extends State<HomePage> {
         centerTitle: true,
       ),
 
-      // 🔥 FONDO IGUAL QUE LOGIN
       body: Stack(
         children: [
           SizedBox.expand(
@@ -175,11 +169,9 @@ class _HomePageState extends State<HomePage> {
               fit: BoxFit.cover,
             ),
           ),
-
           Container(
             color: Colors.black.withOpacity(0.6),
           ),
-
           SafeArea(
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 300),
@@ -189,64 +181,86 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
 
-      // 🔥 DRAWER MODERNO
+      // 🔥 DRAWER MÁS TRANSLÚCIDO
       drawer: Drawer(
-        backgroundColor: const Color(0xFF1A1A1A),
-        child: Column(
-          children: [
-            UserAccountsDrawerHeader(
-              decoration: const BoxDecoration(color: Color(0xFF1E1E1E)),
-              accountName: Text(
-                "${widget.user["nombre"]} ${widget.user["apellido_paterno"]}",
-                style: const TextStyle(color: Colors.white),
+        backgroundColor: Colors.transparent,
+        child: ClipRRect(
+          borderRadius: const BorderRadius.only(
+            topRight: Radius.circular(25),
+            bottomRight: Radius.circular(25),
+          ),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25), // 🔥 más blur
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.2), // 🔥 más transparente
+                border: Border(
+                  right: BorderSide(
+                    color: Colors.white.withOpacity(0.1),
+                  ),
+                ),
               ),
-              accountEmail: Text(
-                widget.user["email"],
-                style: const TextStyle(color: Colors.white70),
-              ),
-              currentAccountPicture: const CircleAvatar(
-                backgroundColor: Color(0xFFD4AF37),
-                child: Icon(Icons.person, color: Colors.black),
+              child: Column(
+                children: [
+
+                  UserAccountsDrawerHeader(
+                    decoration: const BoxDecoration(
+                      color: Colors.transparent,
+                    ),
+                    accountName: Text(
+                      "${widget.user["nombre"]} ${widget.user["apellido_paterno"]}",
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                    accountEmail: Text(
+                      widget.user["email"],
+                      style: const TextStyle(color: Colors.white70),
+                    ),
+                    currentAccountPicture: const CircleAvatar(
+                      backgroundColor: Color(0xFFD4AF37),
+                      child: Icon(Icons.person, color: Colors.black),
+                    ),
+                  ),
+
+                  ...menuItems.map((item) {
+                    return ListTile(
+                      leading: Icon(item["icon"], color: Colors.white70),
+                      title: Text(item["title"],
+                          style: const TextStyle(color: Colors.white)),
+                      onTap: () {
+                        cambiarPagina(item["page"]);
+                        Navigator.pop(context);
+                      },
+                    );
+                  }).toList(),
+
+                  ExpansionTile(
+                    iconColor: Colors.white,
+                    collapsedIconColor: Colors.white70,
+                    title: const Text("Catálogos",
+                        style: TextStyle(color: Colors.white)),
+                    leading: const Icon(Icons.category,
+                        color: Colors.white70),
+                    children: [
+                      _menuItem("Camiones", 3),
+                      _menuItem("Rutas", 4),
+                      _menuItem("Horarios", 5),
+                    ],
+                  ),
+
+                  const Spacer(),
+
+                  ListTile(
+                    leading: const Icon(Icons.logout, color: Colors.red),
+                    title: const Text("Cerrar sesión",
+                        style: TextStyle(color: Colors.white)),
+                    onTap: () => cerrarSesion(context),
+                  ),
+
+                  const SizedBox(height: 20),
+                ],
               ),
             ),
-
-            ...menuItems.map((item) {
-              return ListTile(
-                leading: Icon(item["icon"], color: Colors.white70),
-                title: Text(item["title"],
-                    style: const TextStyle(color: Colors.white)),
-                onTap: () {
-                  cambiarPagina(item["page"]);
-                  Navigator.pop(context);
-                },
-              );
-            }).toList(),
-
-            ExpansionTile(
-              iconColor: Colors.white,
-              collapsedIconColor: Colors.white70,
-              title: const Text("Catálogos",
-                  style: TextStyle(color: Colors.white)),
-              leading:
-                  const Icon(Icons.category, color: Colors.white70),
-              children: [
-                _menuItem("Camiones", 3),
-                _menuItem("Rutas", 4),
-                _menuItem("Horarios", 5),
-              ],
-            ),
-
-            const Spacer(),
-
-            ListTile(
-              leading: const Icon(Icons.logout, color: Colors.red),
-              title: const Text("Cerrar sesión",
-                  style: TextStyle(color: Colors.white)),
-              onTap: () => cerrarSesion(context),
-            ),
-
-            const SizedBox(height: 20),
-          ],
+          ),
         ),
       ),
     );
