@@ -60,9 +60,13 @@ class _HomePageState extends State<HomePage> {
       case 2:
         return const UsuariosPage();
       case 3:
-        return CamionesPage(onGuardado: () => cambiarPagina(0));
+        return CamionesPage(
+          onGuardado: () => cambiarPagina(0),
+        );
       case 4:
-        return const RutasPage();
+        return RutasPage( // 🔥 FIX IMPORTANTE
+          onGuardado: () => cambiarPagina(0),
+        );
       case 5:
         return const HorariosPage();
       default:
@@ -175,13 +179,15 @@ class _HomePageState extends State<HomePage> {
           SafeArea(
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 300),
-              child: getPagina(),
+              child: KeyedSubtree( // 🔥 FIX IMPORTANTE
+                key: ValueKey(paginaActual),
+                child: getPagina(),
+              ),
             ),
           ),
         ],
       ),
 
-      // 🔥 DRAWER MÁS TRANSLÚCIDO
       drawer: Drawer(
         backgroundColor: Colors.transparent,
         child: ClipRRect(
@@ -190,10 +196,10 @@ class _HomePageState extends State<HomePage> {
             bottomRight: Radius.circular(25),
           ),
           child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25), // 🔥 más blur
+            filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.2), // 🔥 más transparente
+                color: Colors.black.withOpacity(0.2),
                 border: Border(
                   right: BorderSide(
                     color: Colors.white.withOpacity(0.1),
@@ -202,7 +208,6 @@ class _HomePageState extends State<HomePage> {
               ),
               child: Column(
                 children: [
-
                   UserAccountsDrawerHeader(
                     decoration: const BoxDecoration(
                       color: Colors.transparent,

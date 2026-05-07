@@ -18,7 +18,8 @@ class _LoginPageState extends State<LoginPage> {
   bool cargando = false;
 
   Future<void> login() async {
-    final url = Uri.parse("http://192.168.1.178/api/login.php");
+    //final url = Uri.parse("http://192.168.1.178/api/login.php");
+    final url = Uri.parse("http://192.168.1.156/api/login.php");
 
     final response = await http.post(
       url,

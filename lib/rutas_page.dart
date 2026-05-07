@@ -1,9 +1,12 @@
-import 'dart:ui';
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import '../widgets/glass_card.dart'; // 👈 importa tu widget
+import 'package:http/http.dart' as http;
+import '../widgets/glass_card.dart';
 
 class RutasPage extends StatefulWidget {
-  const RutasPage({super.key});
+  final Function()? onGuardado;
+
+  const RutasPage({super.key, this.onGuardado});
 
   @override
   State<RutasPage> createState() => _RutasPageState();
@@ -12,33 +15,89 @@ class RutasPage extends StatefulWidget {
 class _RutasPageState extends State<RutasPage> {
   final TextEditingController cedis = TextEditingController();
 
-  void guardar() {
-    if (cedis.text.isNotEmpty) {
+  bool cargando = false;
+
+  Future<void> guardar() async {
+    if (cedis.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Cedis guardado")),
+        const SnackBar(content: Text("Ingresa el nombre del CEDIS")),
+      );
+      return;
+    }
+
+    setState(() => cargando = true);
+
+    try {
+      final url = Uri.parse("http://192.168.1.156/api/cedis.php");
+
+      final body = {
+        "cedis": cedis.text,
+      };
+
+      print("🔵 ENVIANDO:");
+      print(jsonEncode(body));
+
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(body),
+      );
+
+      print("🟢 RESPUESTA:");
+      print(response.body);
+
+      final data = jsonDecode(response.body);
+
+      if (data["success"]) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(data["message"])),
+        );
+
+        cedis.clear();
+
+        // 🔥 REGRESAR (SIEMPRE FUNCIONA)
+        await Future.delayed(const Duration(milliseconds: 300));
+
+        if (widget.onGuardado != null) {
+          widget.onGuardado!(); // 👈 HomePage
+        } else {
+          Navigator.pop(context); // 👈 fallback
+        }
+
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(data["message"])),
+        );
+      }
+    } catch (e) {
+      print("🔴 ERROR:");
+      print(e);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Error de conexión")),
       );
     }
+
+    setState(() => cargando = false);
   }
 
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.transparent, // 🔥 importante para ver el fondo del Home
+      color: Colors.transparent,
       child: SingleChildScrollView(
         child: SizedBox(
           height: MediaQuery.of(context).size.height,
           child: Center(
             child: Padding(
               padding: const EdgeInsets.all(20),
-
-              // 🔥 AQUÍ USAS TU GLASS CARD
               child: GlassCard(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
 
                     const Text(
-                      "Registro de cedis",
+                      "Registro de CEDIS",
                       style: TextStyle(
                         fontSize: 20,
                         color: Colors.white,
@@ -69,7 +128,7 @@ class _RutasPageState extends State<RutasPage> {
                       width: double.infinity,
                       height: 50,
                       child: ElevatedButton(
-                        onPressed: guardar,
+                        onPressed: cargando ? null : guardar,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFFD4AF37),
                           foregroundColor: Colors.black,
@@ -77,10 +136,12 @@ class _RutasPageState extends State<RutasPage> {
                             borderRadius: BorderRadius.circular(20),
                           ),
                         ),
-                        child: const Text(
-                          "Guardar",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
+                        child: cargando
+                            ? const CircularProgressIndicator(color: Colors.black)
+                            : const Text(
+                                "Guardar",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
                       ),
                     ),
                   ],
