@@ -242,7 +242,7 @@ class _HomePageState extends State<HomePage> {
                         color: Colors.white70),
                     children: [
                       _menuItem("Camiones", 3),
-                      _menuItem("Rutas", 4),
+                      _menuItem("Cedis", 4),
                       _menuItem("Clientes", 5),
                     ],
                   ),

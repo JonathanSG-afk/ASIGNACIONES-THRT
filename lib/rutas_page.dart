@@ -1,4 +1,6 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import '../widgets/glass_card.dart'; // 👈 importa tu widget
 
 class RutasPage extends StatefulWidget {
   const RutasPage({super.key});
@@ -8,53 +10,84 @@ class RutasPage extends StatefulWidget {
 }
 
 class _RutasPageState extends State<RutasPage> {
-
-  final TextEditingController origen = TextEditingController();
-  final TextEditingController destino = TextEditingController();
+  final TextEditingController cedis = TextEditingController();
 
   void guardar() {
-    if (origen.text.isNotEmpty && destino.text.isNotEmpty) {
+    if (cedis.text.isNotEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Ruta guardada")),
+        const SnackBar(content: Text("Cedis guardado")),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Rutas")),
+    return Material(
+      color: Colors.transparent, // 🔥 importante para ver el fondo del Home
+      child: SingleChildScrollView(
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height,
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
 
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
+              // 🔥 AQUÍ USAS TU GLASS CARD
+              child: GlassCard(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
 
-            TextField(
-              controller: origen,
-              decoration: const InputDecoration(
-                labelText: "Origen",
-                border: OutlineInputBorder(),
+                    const Text(
+                      "Registro de cedis",
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+
+                    const SizedBox(height: 25),
+
+                    TextField(
+                      controller: cedis,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        hintText: "Nombre del CEDIS",
+                        hintStyle: const TextStyle(color: Colors.white60),
+                        filled: true,
+                        fillColor: Colors.white.withOpacity(0.1),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 25),
+
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: guardar,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFD4AF37),
+                          foregroundColor: Colors.black,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                        child: const Text(
+                          "Guardar",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-
-            const SizedBox(height: 15),
-
-            TextField(
-              controller: destino,
-              decoration: const InputDecoration(
-                labelText: "Destino",
-                border: OutlineInputBorder(),
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            ElevatedButton(
-              onPressed: guardar,
-              child: const Text("Guardar"),
-            )
-          ],
+          ),
         ),
       ),
     );
