@@ -36,8 +36,7 @@ class _AsignacionesPageState extends State<AsignacionesPage> {
 
   Future<void> cargarDatos() async {
     try {
-      final url = Uri.parse("http://192.168.1.156/api/asignaciones.php");
-
+      final url = Uri.parse("http://192.168.1.156/asignaciones/api/asignaciones.php");
       final response = await http.get(url);
       final data = jsonDecode(response.body);
 

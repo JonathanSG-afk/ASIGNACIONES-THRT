@@ -28,7 +28,7 @@ class _RutasPageState extends State<RutasPage> {
     setState(() => cargando = true);
 
     try {
-      final url = Uri.parse("http://192.168.1.156/api/cedis.php");
+      final url = Uri.parse("http://192.168.1.156/asignaciones/api/cedis.php");
 
       final body = {
         "cedis": cedis.text,
